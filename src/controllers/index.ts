@@ -5,8 +5,10 @@ import AddUserToDatabase from "../actions/profile/AddUserToDatabase";
 import UpdateUserProfile from "../actions/profile/UpdateUserProfile";
 import { RequestValidator } from "../middlewares/RequestValidator";
 import ValidatedUUIDHeader from "../middlewares/ValidatedUUIDHeader";
-
+import axios from "axios";
+import "dotenv/config";
 const router = Router();
+const REDIRECT_URI = "https://lio-uec9.onrender.com/auth/google/callback"; // Adjust the URI
 
 router.post(
   "/registeruser",
@@ -55,5 +57,71 @@ router.post(
     }
   }
 );
+
+router.get("/auth/google", (req, res) => {
+  const authEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
+
+  const params = {
+    client_id: process.env.CLIENTID,
+    redirect_uri: REDIRECT_URI,
+    response_type: "code",
+    scope: "https://www.googleapis.com/auth/drive.metadata.readonly",
+    include_granted_scopes: "true",
+    state: "pass-through value",
+  };
+
+  const authUrl = `${authEndpoint}?${new URLSearchParams(params)}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gray-100 h-screen flex justify-center items-center">
+      <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <a href="${authUrl}">Login with Google</a>
+      </button>
+      <script>
+        const receiveMessage = (event) => {
+          if (event.origin !== "${"your-redirect-uri"}") return;
+          const token = event.data.token;
+          console.log("Access token:", token);
+          window.close();
+        };
+        window.addEventListener("message", receiveMessage, false);
+      </script>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
+router.get("/auth/google/callback", async (req, res) => {
+  const { code } = req.query;
+
+  try {
+    const tokenEndpoint = "https://oauth2.googleapis.com/token";
+    const tokenResponse = await axios.post(tokenEndpoint, null, {
+      params: {
+        code,
+        client_id: process.env.CLIENTID,
+        client_secret: process.env.CLIENTSECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      },
+    });
+
+    const { access_token, id_token } = tokenResponse.data;
+
+    res.redirect(
+      `exp://192.168.173.187:8081?access_token=${access_token}&id_token=${id_token}&code=${code}`
+    );
+  } catch (error: any) {
+    // Handle errors
+    console.error("Error during authentication:", error.message);
+    res.status(500).send("Authentication error");
+  }
+});
 
 export default router;
