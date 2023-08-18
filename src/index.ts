@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 // import { initializeApp } from "firebase-admin/app";
 import "dotenv/config";
 import router from "./controllers";
+import { getFirestore } from "firebase-admin/firestore";
 
 const app = express();
 app.use(express.json());
@@ -19,7 +20,8 @@ admin.initializeApp({
   databaseURL: "https://dot-king-default-rtdb.firebaseio.com/",
   ignoreUndefinedProperties: true,
 });
-
+const firestore = getFirestore();
+firestore.settings({ ignoreUndefinedProperties: true });
 app.use("/", router);
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(400).json({ error: err.message });

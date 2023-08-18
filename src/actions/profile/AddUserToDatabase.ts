@@ -15,7 +15,7 @@ export default async function AddUserToDatabase(uid: string, data: any) {
 
   try {
     const firestore = getFirestore();
-    firestore.settings({ ignoreUndefinedProperties: true }); // Set Firestore settings
+    // Set Firestore settings
 
     await firestore.collection("profile").doc(uid).set(userdata);
 
