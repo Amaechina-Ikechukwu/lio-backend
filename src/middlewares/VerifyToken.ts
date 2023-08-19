@@ -17,7 +17,7 @@ export default function VerifyToken(token: string): any {
       //   next();
     } catch (error) {
       //   res.status(403).json({ message: "Invalid token" });
-      throw new Error("Invalid token");
+      return "Invalid token";
     }
   }
 }

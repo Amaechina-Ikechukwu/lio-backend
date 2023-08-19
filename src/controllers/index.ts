@@ -7,9 +7,32 @@ import { RequestValidator } from "../middlewares/RequestValidator";
 import ValidatedUUIDHeader from "../middlewares/ValidatedUUIDHeader";
 import axios from "axios";
 import "dotenv/config";
+import VerifyToken from "../middlewares/VerifyToken";
 const router = Router();
 const REDIRECT_URI = "https://lio-uec9.onrender.com/auth/google/callback"; // Adjust the URI
 
+router.get(
+  "/userid",
+  ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
+  async (req: Request, res: Response) => {
+    try {
+      const authorizationHeader = req.header("Authorization");
+      if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+        res.status(400).json({ error: "Invalid or missing bearer token" });
+      }
+
+      const token = authorizationHeader.substring(7); // Remove "Bearer " from the header
+      const verifiedToken = await VerifyToken(token);
+
+      // const uuid = extractUUIDFromToken(verifiedToken?.uuid);
+      const uid = verifiedToken.data;
+      res.status(200).json({ userid: uid });
+    } catch (error) {
+      console.error("Error validating user", error);
+      res.status(500).json({ error: "Internal server error" }); // Handle error properly
+    }
+  }
+);
 router.post(
   "/registeruser",
   RequestValidator(["uid"]), // Assuming RequestValidator middleware is correctly implemented
