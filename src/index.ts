@@ -26,6 +26,9 @@ app.use("/", router);
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(400).json({ error: err.message });
 });
+setInterval(() => {
+  console.log("Hey");
+}, 10000);
 app.listen(3000, () => {
   console.log("Accepted to lio");
 });

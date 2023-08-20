@@ -138,7 +138,7 @@ router.get("/auth/google/callback", async (req, res) => {
     const { access_token, id_token } = tokenResponse.data;
 
     res.redirect(
-      `exp://192.168.173.187:8081?access_token=${access_token}&id_token=${id_token}&code=${code}`
+      `exp://192.168.243.186:8081?access_token=${access_token}&id_token=${id_token}&code=${code}`
     );
   } catch (error: any) {
     // Handle errors
