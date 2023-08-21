@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import RegisterUser from "../actions/auth/RegisterUser";
 import UserAuthenticationData from "../actions/auth/UserAuthenticationData";
 import AddUserToDatabase from "../actions/profile/AddUserToDatabase";
@@ -9,8 +9,22 @@ import axios from "axios";
 import "dotenv/config";
 import VerifyToken from "../middlewares/VerifyToken";
 const router = Router();
-const REDIRECT_URI = "https://lio-uec9.onrender.com/auth/google/callback"; // Adjust the URI
+declare global {
+  namespace Express {
+    interface Request {
+      redirectUri?: string;
+    }
+  }
+}
 
+const REDIRECT_URI = "https://lio-uec9.onrender.com/auth/google/callback"; // Adjust the URI
+router.use((req: Request, res: Response, next: NextFunction) => {
+  const { redirectUri } = req.query;
+  if (redirectUri) {
+    req.redirectUri = redirectUri as string;
+  }
+  next();
+});
 router.get(
   "/userid",
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
@@ -90,7 +104,8 @@ router.get("/auth/google", (req, res) => {
     response_type: "code",
     scope: "https://www.googleapis.com/auth/drive.metadata.readonly",
     include_granted_scopes: "true",
-    state: "pass-through value",
+    state: `${req.redirectUri}`,
+    expo: `${req.redirectUri}`,
   };
 
   const authUrl = `${authEndpoint}?${new URLSearchParams(params)}`;
@@ -120,8 +135,9 @@ router.get("/auth/google", (req, res) => {
 
   res.send(html);
 });
+
 router.get("/auth/google/callback", async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
 
   try {
     const tokenEndpoint = "https://oauth2.googleapis.com/token";
@@ -138,7 +154,7 @@ router.get("/auth/google/callback", async (req, res) => {
     const { access_token, id_token } = tokenResponse.data;
 
     res.redirect(
-      `exp://192.168.243.186:8081?access_token=${access_token}&id_token=${id_token}&code=${code}`
+      `${state}?access_token=${access_token}&id_token=${id_token}&code=${code}`
     );
   } catch (error: any) {
     // Handle errors
