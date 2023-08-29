@@ -2,8 +2,10 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 export default async function CreateProfolio(data: any, uid: string) {
   try {
     return getFirestore()
-      .collection("portfolio")
+      .collection("portfolios")
       .doc(uid)
+      .collection("lio")
+      .doc()
       .set(Object.assign(data, { createdAt: Timestamp.now() }))
       .then((result) => {
         return result;
