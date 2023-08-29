@@ -1,18 +1,31 @@
 import { getFirestore } from "firebase-admin/firestore";
-export default async function GetUserProjects(uid: string | any) {
+
+interface PortfolioItem {}
+
+export default async function GetUserProjects(
+  uid: string
+): Promise<{ userportfolio: PortfolioItem[] }> {
   try {
-    let userportfolio = [];
-    const firestore = getFirestore(); // Set Firestore settings
+    const userportfolio: PortfolioItem[] = [];
+    const firestore = getFirestore(); // Get Firestore instance
 
-    const doc = await firestore.collection("portfolio").doc(uid).get();
-    if (!doc.exists) {
-      userportfolio.push();
-    } else {
-      userportfolio.push({ id: doc.id, ...doc.data() });
-    }
+    const snapshot = await firestore
+      .collection("portfolio")
+      .doc(uid)
+      .collection("lio")
+      .get();
 
-    return { userportfolio: userportfolio };
+    snapshot.forEach((doc) => {
+      if (doc.exists) {
+        userportfolio.push({ id: doc.id, ...doc.data() });
+      } else {
+        // You might want to handle the case when doc doesn't exist
+        console.log(`Document ${doc.id} does not exist.`);
+      }
+    });
+
+    return { userportfolio };
   } catch (error) {
-    throw new Error(`Error adding user to database ${error}`);
+    throw new Error(`Error fetching user projects from database: ${error}`);
   }
 }
