@@ -10,6 +10,7 @@ import "dotenv/config";
 import VerifyToken from "../middlewares/VerifyToken";
 import GetUserProfile from "../actions/profile/GetUserProfile";
 import GetUserProjects from "../actions/profile/GetUserProjects";
+import CreatePortfolio from "../actions/profile/CreatePortfolio";
 const router = Router();
 declare global {
   namespace Express {
@@ -122,7 +123,7 @@ router.post(
     try {
       // Destructure 'uid' directly from req.body
 
-      const result = await UpdateUserProfile(req.uid, req.body); // Pass 'uid' directly to RegisterUser function
+      const result = await CreatePortfolio(req.uid, req.body); // Pass 'uid' directly to RegisterUser function
       res.status(200).json({ token: result });
     } catch (error) {
       console.error("Add user to database user", error);
