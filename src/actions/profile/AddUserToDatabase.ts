@@ -16,8 +16,12 @@ export default async function AddUserToDatabase(uid: string, data: any) {
   try {
     const firestore = getFirestore();
     // Set Firestore settings
-
-    await firestore.collection("profile").doc(uid).set(userdata);
+    const doc = await firestore.collection("profile").doc(uid).get();
+    if (!doc.exists) {
+      await firestore.collection("profile").doc(uid).set(userdata);
+    } else {
+      null;
+    }
 
     return "done"; // Returning the result directly
   } catch (error) {

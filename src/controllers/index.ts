@@ -8,6 +8,8 @@ import ValidatedUUIDHeader from "../middlewares/ValidatedUUIDHeader";
 import axios from "axios";
 import "dotenv/config";
 import VerifyToken from "../middlewares/VerifyToken";
+import GetUserProfile from "../actions/profile/GetUserProfile";
+import GetUserProjects from "../actions/profile/GetUserProjects";
 const router = Router();
 declare global {
   namespace Express {
@@ -47,6 +49,30 @@ router.get(
     }
   }
 );
+router.get(
+  "/userprofile",
+  ValidatedUUIDHeader,
+  async (req: Request, res: Response) => {
+    try {
+      const result = await GetUserProfile(req.uid);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  }
+);
+router.get(
+  "/userprojects",
+  ValidatedUUIDHeader,
+  async (req: Request, res: Response) => {
+    try {
+      const result = await GetUserProjects(req.uid);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  }
+);
 router.post(
   "/registeruser",
   RequestValidator(["uid"]), // Assuming RequestValidator middleware is correctly implemented
@@ -80,7 +106,17 @@ router.post(
 );
 router.post(
   "/createportfolio",
-  RequestValidator(["imageUrl", "name", "description", "languageStack"]),
+  RequestValidator([
+    "name",
+    "description",
+    "heroimage",
+    "status",
+    "overcome",
+    "challenges",
+    "url",
+    "testinomials",
+    "collectionOfAlbums",
+  ]),
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
   async (req: Request, res: Response) => {
     try {

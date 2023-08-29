@@ -3,8 +3,7 @@ export default async function UpdateUserProfile(uid: string, data: any) {
   const userdata = Object.assign(data, { updatedAt: Timestamp.now() });
   console.log({ userdata });
   try {
-    const firestore = getFirestore();
-    firestore.settings({ ignoreUndefinedProperties: true }); // Set Firestore settings
+    const firestore = getFirestore(); // Set Firestore settings
 
     await firestore.collection("profile").doc(uid).update(userdata);
 
