@@ -115,8 +115,8 @@ router.post(
     "overcome",
     "challenges",
     "url",
-    "testinomials",
-    "collectionOfAlbums",
+    // "testinomials",
+    // "collectionOfAlbums",
   ]),
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
   async (req: Request, res: Response) => {
