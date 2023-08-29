@@ -62,8 +62,17 @@ router.get(
     }
   }
 );
+router.get("/userprojects", async (req: Request, res: Response) => {
+  const { user } = req.query;
+  try {
+    const result = await GetUserProjects(user);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" + error });
+  }
+});
 router.get(
-  "/userprojects",
+  "/getuserprojects",
   ValidatedUUIDHeader,
   async (req: Request, res: Response) => {
     try {

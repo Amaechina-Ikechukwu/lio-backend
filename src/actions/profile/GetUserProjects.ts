@@ -1,5 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
-export default async function GetUserProjects(uid: string) {
+export default async function GetUserProjects(uid: string | any) {
   try {
     let userportfolio = [];
     const firestore = getFirestore(); // Set Firestore settings
