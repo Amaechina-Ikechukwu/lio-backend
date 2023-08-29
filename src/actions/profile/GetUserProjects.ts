@@ -1,6 +1,8 @@
 import { getFirestore } from "firebase-admin/firestore";
 
-interface PortfolioItem {}
+interface PortfolioItem {
+  // Define other properties here
+}
 
 export default async function GetUserProjects(
   uid: string
@@ -17,7 +19,7 @@ export default async function GetUserProjects(
 
     snapshot.forEach((doc) => {
       if (doc.exists) {
-        userportfolio.push({ id: doc.id, ...doc.data() });
+        userportfolio.push({ id: doc.id, ...doc.data() } as PortfolioItem);
       } else {
         // You might want to handle the case when doc doesn't exist
         console.log(`Document ${doc.id} does not exist.`);
