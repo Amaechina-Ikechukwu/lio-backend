@@ -123,7 +123,7 @@ router.post(
     try {
       // Destructure 'uid' directly from req.body
 
-      const result = await CreatePortfolio(req.uid, req.body); // Pass 'uid' directly to RegisterUser function
+      const result = await CreatePortfolio(req.body, req.uid); // Pass 'uid' directly to RegisterUser function
       res.status(200).json({ token: result });
     } catch (error) {
       console.error("Add user to database user", error);
