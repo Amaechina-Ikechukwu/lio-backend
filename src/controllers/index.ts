@@ -64,11 +64,16 @@ router.get(
 );
 router.get("/userprojects", async (req: Request, res: Response) => {
   const { user } = req.query;
-  try {
-    const result = await GetUserProjects(user);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" + error });
+
+  if (typeof user === "string") {
+    try {
+      const result = await GetUserProjects(user);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid user parameter" });
   }
 });
 router.get(
