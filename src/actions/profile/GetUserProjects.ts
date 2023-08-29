@@ -1,5 +1,4 @@
 import { getFirestore } from "firebase-admin/firestore";
-
 interface PortfolioItem {
   id: string;
   // Define other properties here
@@ -16,7 +15,7 @@ export default async function GetUserProjects(
 
     for (const singleUid of uidArray) {
       const snapshot = await firestore
-        .collection("portfolio")
+        .collection("portfolios")
         .doc(singleUid)
         .collection("lio")
         .get();
