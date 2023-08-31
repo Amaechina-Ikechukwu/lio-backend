@@ -28,7 +28,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 setInterval(() => {
   console.log("Hey");
-}, 1000000);
+}, 100000);
 app.listen(3001, () => {
   console.log("Accepted to lio");
 });
