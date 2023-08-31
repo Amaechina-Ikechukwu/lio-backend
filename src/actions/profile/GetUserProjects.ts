@@ -1,7 +1,10 @@
 import { getFirestore } from "firebase-admin/firestore";
+
 interface PortfolioItem {
   id: string;
-  // Define other properties here
+  name: string; // Assuming name is a property of the PortfolioItem
+  description: string; // Assuming description is a property of the PortfolioItem
+  heroimage: string; // Assuming image is a property of the PortfolioItem
 }
 
 export default async function GetUserProjects(
@@ -22,7 +25,8 @@ export default async function GetUserProjects(
 
       snapshot.forEach((doc) => {
         if (doc.exists) {
-          userportfolio.push({ id: doc.id, ...doc.data() } as PortfolioItem);
+          const { name, description, heroimage } = doc.data(); // Extract desired properties
+          userportfolio.push({ id: doc.id, name, description, heroimage });
         } else {
           // You might want to handle the case when doc doesn't exist
           console.log(`Document ${doc.id} does not exist.`);
