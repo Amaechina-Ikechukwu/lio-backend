@@ -16,6 +16,7 @@ const doesUserExists = (uid: string) => {
     throw new Error(`Error checking if user exists user ${error}`);
   }
 };
+
 export default function RegisterUser(data: string) {
   try {
     const uid = data;

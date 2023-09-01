@@ -13,6 +13,10 @@ import GetUserProjects from "../actions/profile/GetUserProjects";
 import CreatePortfolio from "../actions/profile/CreatePortfolio";
 import UpdateProjects from "../actions/profile/EditProject";
 import GetProject from "../actions/profile/Project";
+import GetPortfolioFromGeneral from "../actions/profile/GetPortfolioFromGeneral";
+import GetGeneralUsers from "../actions/profile/GetGeneralUsers";
+import GetSingleUser from "../actions/profile/GetSingleUser";
+import GetSingleProject from "../actions/profile/GetSingleProject";
 const router = Router();
 declare global {
   namespace Express {
@@ -70,6 +74,62 @@ router.get("/userprojects", async (req: Request, res: Response) => {
   if (typeof user === "string") {
     try {
       const result = await GetUserProjects(user);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid user parameter" });
+  }
+});
+router.get("/searchprojects", async (req: Request, res: Response) => {
+  const { search } = req.query;
+
+  if (typeof search === "string") {
+    try {
+      const result = await GetPortfolioFromGeneral(search);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid user parameter" });
+  }
+});
+router.get("/searchusers", async (req: Request, res: Response) => {
+  const { search } = req.query;
+
+  if (typeof search === "string") {
+    try {
+      const result = await GetGeneralUsers(search);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid user parameter" });
+  }
+});
+router.get("/searchuser", async (req: Request, res: Response) => {
+  const { search } = req.query;
+
+  if (typeof search === "string") {
+    try {
+      const result = await GetSingleUser(search);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid user parameter" });
+  }
+});
+router.get("/searchproject", async (req: Request, res: Response) => {
+  const { search } = req.query;
+
+  if (typeof search === "string") {
+    try {
+      const result = await GetSingleProject(search);
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });

@@ -1,4 +1,12 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
+
+const AddToGeneral = async (data: any, uid: string) => {
+  await getFirestore()
+    .collection("general-portfolios")
+    .doc(data.nickname)
+    .set(Object.assign(data, { createdAt: Timestamp.now(), user: uid }));
+  return;
+};
 export default async function CreateProfolio(data: any, uid: string) {
   try {
     return getFirestore()
@@ -8,6 +16,7 @@ export default async function CreateProfolio(data: any, uid: string) {
       .doc()
       .set(Object.assign(data, { createdAt: Timestamp.now() }))
       .then((result) => {
+        AddToGeneral(data, uid);
         return result;
       })
       .catch((error) => {
