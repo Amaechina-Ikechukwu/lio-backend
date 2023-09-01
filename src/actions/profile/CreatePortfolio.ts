@@ -4,7 +4,9 @@ const AddToGeneral = async (data: any, uid: string) => {
   await getFirestore()
     .collection("general-portfolios")
     .doc(data.nickname)
-    .set(Object.assign(data, { createdAt: Timestamp.now(), user: uid }));
+    .set(
+      Object.assign(data, { createdAt: Timestamp.now(), user: data.username })
+    );
   return;
 };
 export default async function CreateProfolio(data: any, uid: string) {

@@ -8,31 +8,28 @@ interface PortfolioItem {
 }
 
 export default async function GetUserProjects(
-  uid: string | string[]
+  username: string
 ): Promise<{ userportfolio: PortfolioItem[] }> {
   try {
     const userportfolio: PortfolioItem[] = [];
     const firestore = getFirestore(); // Get Firestore instance
 
-    const uidArray = Array.isArray(uid) ? uid : [uid]; // Convert to array if not already
+    const snapshot = await firestore
+      .collection("portfolios")
+      .doc()
+      .collection("lio")
+      .where("username", "==", username)
+      .get();
 
-    for (const singleUid of uidArray) {
-      const snapshot = await firestore
-        .collection("portfolios")
-        .doc(singleUid)
-        .collection("lio")
-        .get();
-
-      snapshot.forEach((doc) => {
-        if (doc.exists) {
-          const { name, description, heroimage } = doc.data(); // Extract desired properties
-          userportfolio.push({ id: doc.id, name, description, heroimage });
-        } else {
-          // You might want to handle the case when doc doesn't exist
-          console.log(`Document ${doc.id} does not exist.`);
-        }
-      });
-    }
+    snapshot.forEach((doc) => {
+      if (doc.exists) {
+        const { name, description, heroimage } = doc.data(); // Extract desired properties
+        userportfolio.push({ id: doc.id, name, description, heroimage });
+      } else {
+        // You might want to handle the case when doc doesn't exist
+        console.log(`Document ${doc.id} does not exist.`);
+      }
+    });
 
     return { userportfolio };
   } catch (error) {

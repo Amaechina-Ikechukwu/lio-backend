@@ -69,11 +69,11 @@ router.get(
   }
 );
 router.get("/userprojects", async (req: Request, res: Response) => {
-  const { user } = req.query;
+  const { username } = req.query;
 
-  if (typeof user === "string") {
+  if (typeof username === "string") {
     try {
-      const result = await GetUserProjects(user);
+      const result = await GetUserProjects(username);
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });
