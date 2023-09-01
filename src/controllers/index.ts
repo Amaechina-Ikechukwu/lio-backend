@@ -17,6 +17,7 @@ import GetPortfolioFromGeneral from "../actions/profile/GetPortfolioFromGeneral"
 import GetGeneralUsers from "../actions/profile/GetGeneralUsers";
 import GetSingleUser from "../actions/profile/GetSingleUser";
 import GetSingleProject from "../actions/profile/GetSingleProject";
+import GetProjectsByUsername from "../actions/profile/GetProjectsByUsername";
 const router = Router();
 declare global {
   namespace Express {
@@ -69,11 +70,25 @@ router.get(
   }
 );
 router.get("/userprojects", async (req: Request, res: Response) => {
+  const { uid } = req.query;
+
+  if (typeof uid === "string") {
+    try {
+      const result = await GetUserProjects(uid);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" + error });
+    }
+  } else {
+    res.status(400).json({ error: "Invalid user parameter" });
+  }
+});
+router.get("/userprojectsbyusername", async (req: Request, res: Response) => {
   const { username } = req.query;
 
   if (typeof username === "string") {
     try {
-      const result = await GetUserProjects(username);
+      const result = await GetProjectsByUsername(username);
       res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });

@@ -7,8 +7,8 @@ interface PortfolioItem {
   heroimage: string; // Assuming image is a property of the PortfolioItem
 }
 
-export default async function GetUserProjects(
-  uid: string
+export default async function GetProjectsByUsername(
+  username: string
 ): Promise<{ userportfolio: PortfolioItem[] }> {
   try {
     const userportfolio: PortfolioItem[] = [];
@@ -16,8 +16,7 @@ export default async function GetUserProjects(
 
     const snapshot = await firestore
       .collection("general-portfolios")
-      .doc(uid)
-      .collection("lio")
+      .where("username", "==", username)
       .get();
 
     snapshot.forEach((doc) => {
