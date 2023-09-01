@@ -15,7 +15,7 @@ export default async function GetUserProjects(
     const firestore = getFirestore(); // Get Firestore instance
 
     const snapshot = await firestore
-      .collection("general-portfolios")
+      .collection("portfolios")
       .doc(uid)
       .collection("lio")
       .get();
