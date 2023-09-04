@@ -210,6 +210,21 @@ router.post(
     }
   }
 );
+// router.post(
+//   "/updateproject",
+//   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
+//   async (req: Request, res: Response) => {
+//     try {
+//       // Destructure 'uid' directly from req.body
+
+//       const result = await UpdateProjects(req.body,req.uid ); // Pass 'uid' directly to RegisterUser function
+//       res.status(200).json({ token: result });
+//     } catch (error) {
+//       console.error("Add user to database user", error);
+//       res.status(500).json({ error: "Internal server error" }); // Handle error properly
+//     }
+//   }
+// );
 router.post(
   "/updateproject",
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented

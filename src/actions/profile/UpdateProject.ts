@@ -8,11 +8,7 @@ const AddToGeneral = async (data: any, uid: string, projectId: string) => {
     .update(data);
   return;
 };
-export default async function UpdateUserProfile(
-  data: any,
-  uid: string,
-  projectId: string
-) {
+export default async function UpdateProject(data: any, uid: string) {
   const userdata = Object.assign(data, { updatedAt: Timestamp.now() });
 
   try {
@@ -22,9 +18,9 @@ export default async function UpdateUserProfile(
       .collection("portfolios")
       .doc(uid)
       .collection("lio")
-      .doc(projectId)
+      .doc(data.projectId)
       .update(userdata);
-    await AddToGeneral(userdata, uid, projectId);
+    await AddToGeneral(userdata, uid, data.projectId);
     return { message: "updated" }; // Returning the result directly
   } catch (error) {
     throw new Error(`Error adding user to database ${error}`);

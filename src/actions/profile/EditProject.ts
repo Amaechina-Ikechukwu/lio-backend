@@ -1,4 +1,13 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
+const AddToGeneral = async (data: any, uid: string, projectId: string) => {
+  await getFirestore()
+    .collection("general-portfolios")
+    .doc(uid)
+    .collection("lio")
+    .doc(projectId)
+    .update(data);
+  return;
+};
 export default async function UpdateProjects(
   data: any,
   uid: string,
@@ -15,7 +24,7 @@ export default async function UpdateProjects(
       .collection("lio")
       .doc(projectId)
       .update(userdata);
-
+    await AddToGeneral(userdata, uid, projectId);
     return { message: "updated" }; // Returning the result directly
   } catch (error) {
     throw new Error(`Error adding user to database ${error}`);
