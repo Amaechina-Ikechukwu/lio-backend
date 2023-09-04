@@ -18,6 +18,7 @@ import GetGeneralUsers from "../actions/profile/GetGeneralUsers";
 import GetSingleUser from "../actions/profile/GetSingleUser";
 import GetSingleProject from "../actions/profile/GetSingleProject";
 import GetProjectsByUsername from "../actions/profile/GetProjectsByUsername";
+import DeleteProject from "../actions/profile/DeleteProject";
 const router = Router();
 declare global {
   namespace Express {
@@ -234,6 +235,23 @@ router.post(
       const { projectId } = req.query;
       if (typeof projectId === "string") {
         const result = await UpdateProjects(req.body, req.uid, projectId); // Pass 'uid' directly to RegisterUser function
+        res.status(200).json({ token: result });
+      }
+    } catch (error) {
+      console.error("Add user to database user", error);
+      res.status(500).json({ error: "Internal server error" }); // Handle error properly
+    }
+  }
+);
+router.delete(
+  "/deleteproject",
+  ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
+  async (req: Request, res: Response) => {
+    try {
+      // Destructure 'uid' directly from req.body
+      const { projectId } = req.query;
+      if (typeof projectId === "string") {
+        const result = await DeleteProject(req.body, req.uid, projectId); // Pass 'uid' directly to RegisterUser function
         res.status(200).json({ token: result });
       }
     } catch (error) {
