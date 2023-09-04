@@ -2,9 +2,7 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 const AddToGeneral = async (data: any, uid: string, projectId: string) => {
   await getFirestore()
     .collection("general-portfolios")
-    .doc(uid)
-    .collection("lio")
-    .doc(projectId)
+    .doc(data.nickname)
     .update(data);
   return;
 };
