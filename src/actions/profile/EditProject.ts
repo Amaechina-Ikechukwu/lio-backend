@@ -1,10 +1,12 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 const AddToGeneral = async (data: any, uid: string, projectId: string) => {
-  await getFirestore()
-    .collection("general-portfolios")
-    .doc(data.nickname)
-    .update(data);
-  return;
+  try {
+    await getFirestore()
+      .collection("general-portfolios")
+      .doc(data.nickname)
+      .update(data);
+    return;
+  } catch {}
 };
 export default async function UpdateProjects(
   data: any,
