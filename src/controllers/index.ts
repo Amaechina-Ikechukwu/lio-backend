@@ -19,6 +19,8 @@ import GetSingleUser from "../actions/profile/GetSingleUser";
 import GetSingleProject from "../actions/profile/GetSingleProject";
 import GetProjectsByUsername from "../actions/profile/GetProjectsByUsername";
 import DeleteProject from "../actions/profile/DeleteProject";
+import AddToClicks from "../actions/profile/AddToClicks";
+import NumberOfClicks from "../actions/profile/GetNumberOfClicks";
 const router = Router();
 declare global {
   namespace Express {
@@ -196,6 +198,28 @@ router.post(
     }
   }
 );
+router.post("/addtoclicks", async (req: Request, res: Response) => {
+  try {
+    const { uid } = req.body;
+    await AddToClicks(uid);
+    res.status(200).json();
+  } catch (error) {
+    console.error("Error validating user", error);
+    res.status(500).json({ error: "Internal server error" }); // Handle error properly
+  }
+});
+router.get("/numberofclicks", async (req: Request, res: Response) => {
+  const { uid } = req.query;
+  if (typeof uid == "string") {
+    try {
+      const { number } = await NumberOfClicks(uid);
+      res.status(200).json({ number });
+    } catch (error) {
+      console.error("Error validating user", error);
+      res.status(500).json({ error: "Internal server error" }); // Handle error properly
+    }
+  }
+});
 router.post(
   "/updateuserprofile",
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
