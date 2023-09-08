@@ -21,6 +21,7 @@ import GetProjectsByUsername from "../actions/profile/GetProjectsByUsername";
 import DeleteProject from "../actions/profile/DeleteProject";
 import AddToClicks from "../actions/profile/AddToClicks";
 import NumberOfClicks from "../actions/profile/GetNumberOfClicks";
+import ProjectClicks from "../actions/profile/ProjectClicks";
 const router = Router();
 declare global {
   namespace Express {
@@ -202,6 +203,16 @@ router.post("/addtoclicks", async (req: Request, res: Response) => {
   try {
     const { uid } = req.body;
     await AddToClicks(uid);
+    res.status(200).json();
+  } catch (error) {
+    console.error("Error validating user", error);
+    res.status(500).json({ error: "Internal server error" }); // Handle error properly
+  }
+});
+router.post("/projectclicks", async (req: Request, res: Response) => {
+  try {
+    const { uid, projectId } = req.body;
+    await ProjectClicks(uid, projectId);
     res.status(200).json();
   } catch (error) {
     console.error("Error validating user", error);
