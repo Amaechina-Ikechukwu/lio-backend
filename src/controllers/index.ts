@@ -22,6 +22,7 @@ import DeleteProject from "../actions/profile/DeleteProject";
 import AddToClicks from "../actions/profile/AddToClicks";
 import NumberOfClicks from "../actions/profile/GetNumberOfClicks";
 import ProjectClicks from "../actions/profile/ProjectClicks";
+
 const router = Router();
 declare global {
   namespace Express {
@@ -246,21 +247,6 @@ router.post(
     }
   }
 );
-// router.post(
-//   "/updateproject",
-//   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
-//   async (req: Request, res: Response) => {
-//     try {
-//       // Destructure 'uid' directly from req.body
-
-//       const result = await UpdateProjects(req.body,req.uid ); // Pass 'uid' directly to RegisterUser function
-//       res.status(200).json({ token: result });
-//     } catch (error) {
-//       console.error("Add user to database user", error);
-//       res.status(500).json({ error: "Internal server error" }); // Handle error properly
-//     }
-//   }
-// );
 router.post(
   "/updateproject",
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
@@ -355,6 +341,58 @@ router.get("/auth/google", (req, res) => {
           window.close();
         };
         window.addEventListener("message", receiveMessage, false);
+      </script>
+    </body>
+    </html>
+  `;
+
+  res.send(html);
+});
+router.get("/auth/firebase", (req, res) => {
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Google Sign-In</title>
+    </head>
+    <body class="container mx-auto p-4 px-10">
+    <div class="w-full h-full  sm:px-20  items-center justify-center"><button id="googleSignInButton" class=" bg-black text-gray-200 rounded-xl shadow-xl py-4 px-4 font-bold transition duration-300 transform hover:scale-105 hover:ring-light-accent focus:outline-none ring ring-gray-300">
+        Sign in with Google
+      </button></div>
+      
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const googleSignInButton = document.getElementById('googleSignInButton');
+
+          googleSignInButton.addEventListener('click', async function() {
+            try {
+              // Import the necessary Firebase modules
+              const { GoogleAuthProvider, signInWithPopup, getAuth } = require("firebase/auth");
+
+              const auth = getAuth()
+              const provider = new GoogleAuthProvider();
+              const result = await signInWithPopup(auth, provider);
+              const credential = GoogleAuthProvider.credentialFromResult(result);
+              const token = credential?.accessToken || "";
+              const user = result.user || "";
+
+              console.log(user);
+              
+            } catch (error) {
+              const errorCode = error?.code || "";
+              const errorMessage = error?.message || "";
+              const email = error.customData?.email || "";
+              const credential = GoogleAuthProvider.credentialFromError(error);
+
+              // Handle Errors here.
+              console.error(errorCode, errorMessage, email, credential);
+            }
+          });
+        });
       </script>
     </body>
     </html>

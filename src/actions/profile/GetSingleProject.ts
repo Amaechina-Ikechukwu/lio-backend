@@ -26,7 +26,7 @@ export default async function GetSingleProject(
       if (doc.exists) {
         // Extract desired properties
 
-        projectData = doc.data();
+        projectData = { id: doc.id, ...doc.data() };
       } else {
         console.error("Document does not exist:", doc.id);
         // You might want to handle the case when doc doesn't exist
