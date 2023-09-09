@@ -5,6 +5,7 @@ interface PortfolioItem {
   name: string; // Assuming name is a property of the PortfolioItem
   description: string; // Assuming description is a property of the PortfolioItem
   heroimage: string; // Assuming image is a property of the PortfolioItem
+  nickname: string;
 }
 
 export default async function GetUserProjects(
@@ -22,8 +23,14 @@ export default async function GetUserProjects(
 
     snapshot.forEach((doc) => {
       if (doc.exists) {
-        const { name, description, heroimage } = doc.data(); // Extract desired properties
-        userportfolio.push({ id: doc.id, name, description, heroimage });
+        const { name, description, heroimage, nickname } = doc.data(); // Extract desired properties
+        userportfolio.push({
+          id: doc.id,
+          name,
+          description,
+          heroimage,
+          nickname,
+        });
       } else {
         // You might want to handle the case when doc doesn't exist
         console.log(`Document ${doc.id} does not exist.`);
