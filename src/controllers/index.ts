@@ -32,7 +32,8 @@ declare global {
   }
 }
 
-const REDIRECT_URI = "https://lio-uec9.onrender.com/auth/google/callback"; // Adjust the URI
+const REDIRECT_URI =
+  "https://0ea7-129-205-113-158.ngrok-free.app/auth/google/callback"; // Adjust the URI
 router.use((req: Request, res: Response, next: NextFunction) => {
   const { redirectUri } = req.query;
   if (redirectUri) {
@@ -310,12 +311,11 @@ router.post(
 
 router.get("/auth/google", (req, res) => {
   const authEndpoint = "https://accounts.google.com/o/oauth2/v2/auth";
-
   const params = {
     client_id: process.env.CLIENTID,
     redirect_uri: REDIRECT_URI,
     response_type: "code",
-    scope: "https://www.googleapis.com/auth/drive.metadata.readonly",
+    scope: "openid email",
     include_granted_scopes: "true",
     state: `${req.redirectUri}`,
     expo: `${req.redirectUri}`,
@@ -347,6 +347,33 @@ router.get("/auth/google", (req, res) => {
   `;
 
   res.send(html);
+});
+
+router.get("/auth/google/callback", async (req, res) => {
+  const { code, state } = req.query;
+
+  try {
+    const tokenEndpoint = "https://www.googleapis.com/oauth2/v4/token";
+    const tokenResponse = await axios.post(tokenEndpoint, null, {
+      params: {
+        code,
+        client_id: process.env.CLIENTID,
+        client_secret: process.env.CLIENTSECRET,
+        redirect_uri: REDIRECT_URI,
+        grant_type: "authorization_code",
+      },
+    });
+    console.log({ tokenResponse });
+    const { access_token, id_token } = tokenResponse.data;
+
+    res.redirect(
+      `${state}?access_token=${access_token}&id_token=${id_token}&code=${code}`
+    );
+  } catch (error: any) {
+    // Handle errors
+    console.error("Error during authentication:", error.message);
+    res.status(500).send("Authentication error");
+  }
 });
 router.get("/auth/firebase", (req, res) => {
   const html = `
@@ -400,32 +427,4 @@ router.get("/auth/firebase", (req, res) => {
 
   res.send(html);
 });
-
-router.get("/auth/google/callback", async (req, res) => {
-  const { code, state } = req.query;
-
-  try {
-    const tokenEndpoint = "https://oauth2.googleapis.com/token";
-    const tokenResponse = await axios.post(tokenEndpoint, null, {
-      params: {
-        code,
-        client_id: process.env.CLIENTID,
-        client_secret: process.env.CLIENTSECRET,
-        redirect_uri: REDIRECT_URI,
-        grant_type: "authorization_code",
-      },
-    });
-
-    const { access_token, id_token } = tokenResponse.data;
-
-    res.redirect(
-      `${state}?access_token=${access_token}&id_token=${id_token}&code=${code}`
-    );
-  } catch (error: any) {
-    // Handle errors
-    console.error("Error during authentication:", error.message);
-    res.status(500).send("Authentication error");
-  }
-});
-
 export default router;
