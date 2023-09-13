@@ -190,6 +190,7 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       const { uid } = req.body; // Destructure 'uid' directly from req.body
+      console.log({ uid });
       const result = await RegisterUser(uid);
       const data = await UserAuthenticationData(uid);
       await AddUserToDatabase(uid, data);
@@ -362,7 +363,6 @@ router.get("/auth/google/callback", async (req, res) => {
         grant_type: "authorization_code",
       },
     });
-    console.log({ tokenResponse });
     const { access_token, id_token } = tokenResponse.data;
 
     res.redirect(
