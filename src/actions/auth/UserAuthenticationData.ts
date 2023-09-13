@@ -1,5 +1,5 @@
 import { getAuth } from "firebase-admin/auth";
-export default function UserAuthenticationData(uid: string) {
+export default async function UserAuthenticationData(uid: string) {
   return getAuth()
     .getUser(uid)
     .then((userRecord: any) => {
