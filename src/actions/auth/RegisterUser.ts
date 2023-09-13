@@ -17,7 +17,7 @@ const doesUserExists = (uid: string) => {
   }
 };
 
-export default function RegisterUser(data: string) {
+export default async function RegisterUser(data: string) {
   try {
     const uid = data;
     if (doesUserExists(uid)) {

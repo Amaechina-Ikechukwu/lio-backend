@@ -189,8 +189,7 @@ router.post(
   RequestValidator(["uid"]), // Assuming RequestValidator middleware is correctly implemented
   async (req: Request, res: Response) => {
     try {
-      const { uid } = req.body; // Destructure 'uid' directly from req.body
-      console.log({ uid });
+      const { uid } = req.body; // Destructure 'uid' directly from req.bodys
       const result = await RegisterUser(uid);
       const data = await UserAuthenticationData(uid);
       await AddUserToDatabase(uid, data);
