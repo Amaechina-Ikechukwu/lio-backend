@@ -32,8 +32,7 @@ declare global {
   }
 }
 
-const REDIRECT_URI =
-  "https://0ea7-129-205-113-158.ngrok-free.app/auth/google/callback"; // Adjust the URI
+const REDIRECT_URI = "https://lio-uec9.onrender.com/auth/google/callback"; // Adjust the URI
 router.use((req: Request, res: Response, next: NextFunction) => {
   const { redirectUri } = req.query;
   if (redirectUri) {
