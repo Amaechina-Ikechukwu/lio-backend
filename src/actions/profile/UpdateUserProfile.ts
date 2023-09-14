@@ -2,7 +2,7 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 export default async function UpdateUserProfile(uid: string, data: any) {
   const userdata = Object.assign(data, {
     updatedAt: Timestamp.now(),
-    username: data.displayName.toLowerCase().split(" ").join("-"),
+    username: data.displayName.trim().toLowerCase().split(" ").join("-"),
   });
 
   try {

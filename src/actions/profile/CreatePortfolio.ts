@@ -19,13 +19,13 @@ export default async function CreateProfolio(data: any, uid: string) {
       .set(
         Object.assign(data, {
           createdAt: Timestamp.now(),
-          nickname: data.name.toLowerCase().split(" ").join("-"),
+          nickname: data.name.trim().toLowerCase().split(" ").join("-"),
         })
       )
       .then((result) => {
         AddToGeneral(
           Object.assign(data, {
-            nickname: data.name.toLowerCase().split(" ").join("-"),
+            nickname: data.name.trim().toLowerCase().split(" ").join("-"),
           }),
           uid
         );
