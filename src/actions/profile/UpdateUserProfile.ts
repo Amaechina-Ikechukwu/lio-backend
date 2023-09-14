@@ -1,6 +1,9 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
 export default async function UpdateUserProfile(uid: string, data: any) {
-  const userdata = Object.assign(data, { updatedAt: Timestamp.now() });
+  const userdata = Object.assign(data, {
+    updatedAt: Timestamp.now(),
+    username: data.displayName.toLowerCase().split(" ").join("-"),
+  });
 
   try {
     const firestore = getFirestore(); // Set Firestore settings

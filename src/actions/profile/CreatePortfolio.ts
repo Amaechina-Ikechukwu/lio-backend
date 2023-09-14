@@ -16,9 +16,19 @@ export default async function CreateProfolio(data: any, uid: string) {
       .doc(uid)
       .collection("lio")
       .doc()
-      .set(Object.assign(data, { createdAt: Timestamp.now() }))
+      .set(
+        Object.assign(data, {
+          createdAt: Timestamp.now(),
+          nickname: data.name.toLowerCase().split(" ").join("-"),
+        })
+      )
       .then((result) => {
-        AddToGeneral(data, uid);
+        AddToGeneral(
+          Object.assign(data, {
+            nickname: data.name.toLowerCase().split(" ").join("-"),
+          }),
+          uid
+        );
         return result;
       })
       .catch((error) => {
