@@ -3,7 +3,7 @@ const AddToGeneral = async (data: any, uid: string, projectId: string) => {
   try {
     await getFirestore()
       .collection("general-portfolios")
-      .doc(data.nickname)
+      .doc(projectId)
       .update(data);
     return;
   } catch {}

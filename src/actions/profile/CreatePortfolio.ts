@@ -3,7 +3,7 @@ import { getFirestore, Timestamp } from "firebase-admin/firestore";
 const AddToGeneral = async (data: any, uid: string) => {
   await getFirestore()
     .collection("general-portfolios")
-    .doc(data.nickname)
+    .doc()
     .set(
       Object.assign(data, { createdAt: Timestamp.now(), user: data.username })
     );
