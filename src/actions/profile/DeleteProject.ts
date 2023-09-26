@@ -10,11 +10,11 @@ const deletedProjects = async (data: any, uid: string, projectId: string) => {
       .set(data);
   } catch {}
 };
-const DeleteFromGeneral = async (data: any) => {
+const DeleteFromGeneral = async (data: any, projectId: string) => {
   try {
     await getFirestore()
       .collection("general-portfolios")
-      .doc(data.nickname)
+      .doc(projectId)
       .delete();
     return;
   } catch {}
@@ -34,7 +34,7 @@ export default async function DeleteProject(
       .collection("lio")
       .doc(projectId)
       .delete();
-    await DeleteFromGeneral(data);
+    await DeleteFromGeneral(data, projectId);
     return { message: "deleted" }; // Returning the result directly
   } catch (error) {
     throw new Error(`Error adding user to database ${error}`);

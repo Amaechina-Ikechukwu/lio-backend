@@ -298,8 +298,11 @@ router.post(
   async (req: Request, res: Response) => {
     try {
       // Destructure 'uid' directly from req.body
-
-      const result = await CreatePortfolio(req.body, req.uid); // Pass 'uid' directly to RegisterUser function
+      const { userprofile } = await GetUserProfile(req.uid);
+      const data = Object.assign(req.body, {
+        user: userprofile.displayName.trim().toLowerCase().split(" ").join("-"),
+      });
+      const result = await CreatePortfolio(data, req.uid); // Pass 'uid' directly to RegisterUser function
       res.status(200).json({ token: result });
     } catch (error) {
       console.error("Add user to database user", error);
