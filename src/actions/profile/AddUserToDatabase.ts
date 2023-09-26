@@ -11,7 +11,7 @@ export default async function AddUserToDatabase(uid: string, data: any) {
     {
       timestamp: Timestamp.now(),
       username:
-        userDataWithoutMetadata.displayName > 0 &&
+        userDataWithoutMetadata.displayName &&
         userDataWithoutMetadata.displayName.toLowerCase().split(" ").join("-"),
     }
   ); // Creating a new object with the timestamp field
