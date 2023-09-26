@@ -37,14 +37,6 @@ export default async function GetProjectsByUsername(
           heroimage,
           nickname,
         });
-
-        userportfolio.push({
-          id: doc.id,
-          name,
-          description,
-          heroimage,
-          nickname,
-        });
       } else {
         // You might want to handle the case when doc doesn't exist
         console.log(`Document ${doc.id} does not exist.`);
