@@ -6,7 +6,12 @@ interface PortfolioItem {
   description: string; // Assuming description is a property of the PortfolioItem
   heroimage: string; // Assuming image is a property of the PortfolioItem
 }
-
+function truncateDescription(description: string, maxLength: number) {
+  if (description.length > maxLength) {
+    return description.slice(0, maxLength - 3) + "...";
+  }
+  return description;
+}
 export default async function GetProjectsByUsername(
   username: string
 ): Promise<{ userportfolio: PortfolioItem[] }> {
@@ -16,12 +21,21 @@ export default async function GetProjectsByUsername(
 
     const snapshot = await firestore
       .collection("general-portfolios")
-      .where("username", "==", username)
+      .where("user", "==", username)
       .get();
 
     snapshot.forEach((doc) => {
       if (doc.exists) {
         const { name, description, heroimage } = doc.data(); // Extract desired properties
+        const truncatedDescription = truncateDescription(description, 200);
+
+        userportfolio.push({
+          id: doc.id,
+          name,
+          description: truncatedDescription,
+          heroimage,
+        });
+
         userportfolio.push({ id: doc.id, name, description, heroimage });
       } else {
         // You might want to handle the case when doc doesn't exist
