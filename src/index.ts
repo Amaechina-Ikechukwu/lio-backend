@@ -26,9 +26,7 @@ app.use("/", router);
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(400).json({ error: err.message });
 });
-setInterval(() => {
-  console.log("Hey");
-}, 100000);
-app.listen(3001, () => {
+const port = process.env.PORT || 3006;
+app.listen(port, () => {
   console.log("Accepted to lio");
 });
