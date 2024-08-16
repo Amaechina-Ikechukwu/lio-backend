@@ -7,7 +7,7 @@ interface PortfolioItem {
   heroimage: string; // Assuming image is a property of the PortfolioItem
   nickname: string;
 }
-function truncateDescription(description: string, maxLength: number) {
+export function truncateDescription(description: string, maxLength: number) {
   if (description.length > maxLength) {
     return description.slice(0, maxLength - 3) + "...";
   }

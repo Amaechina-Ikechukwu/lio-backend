@@ -3,6 +3,7 @@ import express, { Request, Response, NextFunction } from "express";
 import "dotenv/config";
 import router from "./controllers";
 import { getFirestore } from "firebase-admin/firestore";
+import explorerouter from "./controllers/explore";
 
 const app = express();
 app.use(express.json());
@@ -23,10 +24,11 @@ admin.initializeApp({
 const firestore = getFirestore();
 firestore.settings({ ignoreUndefinedProperties: true });
 app.use("/", router);
+app.use("/explore", explorerouter);
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(400).json({ error: err.message });
 });
-const port = process.env.PORT || 3006;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  console.log("Accepted to lio");
+  console.log("Accepted to lio new");
 });

@@ -2,10 +2,10 @@
   "name": "lio",
   "version": "1.0.0",
   "description": "Easy way to combine and show your portfolio",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build && nodemon --exec \"ts-node\" src/index.ts",
+    "start": " nodemon --exec \"ts-node\" src/index.ts",
     "build": "tsc"
   },
   "keywords": [

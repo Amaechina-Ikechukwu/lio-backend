@@ -8,25 +8,31 @@ const deletedProjects = async (data: any, uid: string, projectId: string) => {
       .collection("projects")
       .doc(projectId)
       .set(data);
-  } catch {}
+  } catch (error) {
+    console.error("Error moving project to deleted:", error);
+  }
 };
-const DeleteFromGeneral = async (data: any, projectId: string) => {
+
+const DeleteFromGeneral = async (projectId: string) => {
   try {
     await getFirestore()
       .collection("general-portfolios")
       .doc(projectId)
       .delete();
-    return;
-  } catch {}
+  } catch (error) {
+    console.error("Error deleting from general portfolios:", error);
+  }
 };
+
 export default async function DeleteProject(
   data: any,
   uid: string,
   projectId: string
 ) {
   try {
-    deletedProjects(data, uid, projectId);
-    const firestore = getFirestore(); // Set Firestore settings
+    await deletedProjects(data, uid, projectId);
+
+    const firestore = getFirestore();
 
     await firestore
       .collection("portfolios")
@@ -34,9 +40,11 @@ export default async function DeleteProject(
       .collection("lio")
       .doc(projectId)
       .delete();
-    await DeleteFromGeneral(data, projectId);
-    return { message: "deleted" }; // Returning the result directly
+
+    await DeleteFromGeneral(projectId);
+
+    return { message: "deleted" };
   } catch (error) {
-    throw new Error(`Error adding user to database ${error}`);
+    throw new Error(`Error deleting project: ${error}`);
   }
 }
