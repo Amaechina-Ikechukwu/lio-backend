@@ -2,6 +2,7 @@ import { PublicPortfolioDTO } from "../../middlewares/PublicPortfolioDto";
 import GetAllUsers from "../auth/GetAllUsers";
 import NumberOfClicks from "../profile/GetNumberOfClicks";
 import GetUserProfile from "../profile/GetUserProfile";
+import GetUserProjects from "../profile/GetUserProjects";
 
 export default async function GetPortfolioByClicks(): Promise<{
   portfolios: any;
@@ -15,7 +16,7 @@ export default async function GetPortfolioByClicks(): Promise<{
       let portfolioClicks = 0;
       const { userprofile } = await GetUserProfile(users[i].uid);
       const projectClicks = await NumberOfClicks(users[i].uid);
-
+      const { userportfolio } = await GetUserProjects(users[1].uid);
       if (projectClicks) {
         portfolioClicks += projectClicks.number;
       }
@@ -24,6 +25,7 @@ export default async function GetPortfolioByClicks(): Promise<{
         portfolios.push({
           ...profile.userprofile, // Spread the properties of the individual PortfolioItem
           portfolioClicks, // Add the portfolioClicks property
+          projects: userportfolio.length,
         });
       }
     }

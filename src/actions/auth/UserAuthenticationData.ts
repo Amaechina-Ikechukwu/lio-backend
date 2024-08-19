@@ -1,4 +1,5 @@
 import { getAuth } from "firebase-admin/auth";
+import logger from "../../middlewares/logger";
 export default async function UserAuthenticationData(uid: string) {
   return getAuth()
     .getUser(uid)
@@ -8,6 +9,6 @@ export default async function UserAuthenticationData(uid: string) {
       return userRecord;
     })
     .catch((error: any) => {
-      console.log("Error fetching user data:", error);
+      logger.error("Error fetching user data:", error);
     });
 }

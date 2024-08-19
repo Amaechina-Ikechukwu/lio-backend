@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 
 interface UserItem {
   displayName: string; // Assuming name is a property of the UserItem
@@ -19,7 +20,7 @@ export default async function GetSingleUser(
       .where("username", "==", search)
       .get();
     if (snapshot.empty) {
-      console.log("No matching documents.");
+      logger.error("No matching documents.");
       return { userData };
     }
     snapshot.forEach((doc) => {

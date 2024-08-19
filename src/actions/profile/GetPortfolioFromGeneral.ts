@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 
 interface PortfolioItem {
   id: string;
@@ -16,7 +17,7 @@ export default async function GetPortfolioFromGeneral(
 
     const snapshot = await firestore.collection("general-portfolios").get();
     if (snapshot.empty) {
-      console.log("No matching documents.");
+      logger.error("No matching documents.");
       return { userportfolio };
     }
     snapshot.forEach((doc) => {

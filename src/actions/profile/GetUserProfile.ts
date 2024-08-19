@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 export default async function GetUserProfile(uid: string) {
   try {
     let userdata;
@@ -6,7 +7,7 @@ export default async function GetUserProfile(uid: string) {
 
     const doc = await firestore.collection("profile").doc(uid).get();
     if (!doc.exists) {
-      console.log("No such document!");
+      logger.error("No such document!");
     } else {
       userdata = doc.data();
     }

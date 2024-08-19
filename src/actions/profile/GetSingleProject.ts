@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 
 interface ProjectItem {
   displayName: string; // Assuming name is a property of the ProjectItem
@@ -19,7 +20,7 @@ export default async function GetSingleProject(
       .where("nickname", "==", search)
       .get();
     if (snapshot.empty) {
-      console.log("No matching documents.");
+      logger.error("No matching documents.");
       return { projectData };
     }
     snapshot.forEach((doc) => {

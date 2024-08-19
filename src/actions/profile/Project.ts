@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 export default async function GetProject(uid: string, projectId: string) {
   try {
     let userportfolio;
@@ -11,7 +12,7 @@ export default async function GetProject(uid: string, projectId: string) {
       .doc(projectId)
       .get();
     if (!doc.exists) {
-      console.log("No such document!");
+      logger.error("No such document!");
     } else {
       userportfolio = doc.data();
     }

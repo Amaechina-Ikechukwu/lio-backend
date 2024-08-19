@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 
 export default async function NumberOfClicks(uid: string) {
   try {
@@ -11,7 +12,7 @@ export default async function NumberOfClicks(uid: string) {
       .get();
 
     if (snapshot.empty) {
-      console.log("No matching documents.");
+      logger.error("No matching documents.");
       return { number: 0 };
     }
 

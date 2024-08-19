@@ -1,5 +1,6 @@
 import { getAuth } from "firebase-admin/auth";
 import jwt from "jsonwebtoken";
+import logger from "../../middlewares/logger";
 const doesUserExists = (uid: string) => {
   try {
     return getAuth()
@@ -10,7 +11,7 @@ const doesUserExists = (uid: string) => {
         return true;
       })
       .catch((error) => {
-        console.log("Error fetching user data:", error);
+        logger.error("Error fetching user data:", error);
       });
   } catch (error: any) {
     throw new Error(`Error checking if user exists user ${error}`);

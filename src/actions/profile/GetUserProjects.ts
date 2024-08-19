@@ -1,4 +1,5 @@
 import { getFirestore } from "firebase-admin/firestore";
+import logger from "../../middlewares/logger";
 
 interface PortfolioItem {
   id: string;
@@ -33,7 +34,7 @@ export default async function GetUserProjects(
         });
       } else {
         // You might want to handle the case when doc doesn't exist
-        console.log(`Document ${doc.id} does not exist.`);
+        logger.error(`Document ${doc.id} does not exist.`);
       }
     });
 

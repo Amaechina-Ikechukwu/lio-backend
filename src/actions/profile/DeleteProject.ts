@@ -33,15 +33,13 @@ export default async function DeleteProject(
     await deletedProjects(data, uid, projectId);
 
     const firestore = getFirestore();
-
+    await DeleteFromGeneral(projectId);
     await firestore
       .collection("portfolios")
       .doc(uid)
       .collection("lio")
       .doc(projectId)
       .delete();
-
-    await DeleteFromGeneral(projectId);
 
     return { message: "deleted" };
   } catch (error) {
