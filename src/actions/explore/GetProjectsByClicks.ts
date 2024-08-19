@@ -57,6 +57,9 @@ export default async function GetProjectsByClicks(): Promise<{
             user: doc.data().user,
             technologyStack: doc.data().technologyStack,
             category: doc.data().category,
+            nickName: doc.data().nickname,
+            heroImage: doc.data().heroimage,
+            description: doc.data().description,
             clicks: clicks || 0, // Default to 0 if clicks is undefined
           };
         } else {
@@ -72,8 +75,9 @@ export default async function GetProjectsByClicks(): Promise<{
     projects = (await Promise.all(projectPromises)).filter(
       (project) => project !== null
     );
+    const sortedProjects = projects.sort((a, b) => b.clicks - a.clicks);
 
-    return { projects };
+    return { projects: sortedProjects };
   } catch (error) {
     console.error("Error fetching portfolios by clicks:", error);
     throw error;
