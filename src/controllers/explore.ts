@@ -33,17 +33,17 @@ explorerouter.get(
     }
   }
 );
-explorerouter.search(
+explorerouter.get(
   "/search", // Assuming RequestValidator middleware is correctly implemented
   async (req: Request, res: Response) => {
     const search = (req.query.search as string) || "";
     const category = (req.query.category as string) || "";
 
     try {
-      const { userportfolio } = await QueryPortfolio(search, category);
+      const { portfolio } = await QueryPortfolio(search, category);
       // const uuid = extractUUIDFromToken(verifiedToken?.uuid);
 
-      res.status(200).json({ userportfolio });
+      res.status(200).json({ portfolio });
     } catch (error) {
       console.error("Error validating user", error);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly

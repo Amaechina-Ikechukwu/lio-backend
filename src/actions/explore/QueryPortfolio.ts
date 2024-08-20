@@ -7,25 +7,27 @@ interface PortfolioItem {
   heroimage: string;
   technologyStack: string;
   tags: string;
+  user: string;
 }
 
 export default async function QueryPortfolio(
   search: string,
   category: string
-): Promise<{ userportfolio: PortfolioItem[] }> {
+): Promise<{ portfolio: PortfolioItem[] }> {
   try {
     const userportfolio: PortfolioItem[] = [];
     const firestore = getFirestore();
 
     const snapshot = await firestore.collection("general-portfolios").get();
     if (snapshot.empty) {
-      return { userportfolio };
+      return { portfolio: userportfolio };
     }
 
     snapshot.forEach((doc) => {
       if (doc.exists) {
         const data = doc.data() as PortfolioItem;
-        const { name, description, heroimage, technologyStack, tags } = data;
+        const { name, description, heroimage, technologyStack, tags, user } =
+          data;
 
         const matchesSearch = (field: string) =>
           field.toLowerCase().includes(search.toLowerCase());
@@ -52,6 +54,7 @@ export default async function QueryPortfolio(
             heroimage,
             technologyStack,
             tags,
+            user,
           });
         }
       } else {
@@ -59,7 +62,7 @@ export default async function QueryPortfolio(
       }
     });
 
-    return { userportfolio };
+    return { portfolio: userportfolio };
   } catch (error) {
     throw new Error(`Error fetching user projects from the database: ${error}`);
   }
