@@ -13,7 +13,7 @@ export interface ExplorePortfolioItem {
   nickname: string;
   portfolioClicks: string | number;
 }
-export interface PublicUserProfileDTO {
+export interface PublicUserProfile {
   displayName: string;
   username: string;
   bio: string;
@@ -22,7 +22,7 @@ export interface PublicUserProfileDTO {
   technologyStack: string;
 }
 
-export interface PublicPortfolioDTO {
-  userprofile: PublicUserProfileDTO;
-  portfolioClicks: number;
+export interface PublicPortfolio {
+  userprofile: PublicUserProfile;
+  portfolioClicks?: number;
 }

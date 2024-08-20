@@ -1,7 +1,7 @@
 import { truncateDescription } from "../actions/profile/GetProjectsByUsername";
-import { PublicPortfolioDTO } from "../interfaces";
+import { PublicPortfolio } from "../interfaces";
 
-export function PublicPortfolioDTO(portfolio: any): PublicPortfolioDTO {
+export function PublicPortfolioDTO(portfolio: any): PublicPortfolio {
   return {
     userprofile: {
       displayName: portfolio.displayName,

@@ -1,7 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import logger from "../../middlewares/logger";
 
-interface UserItem {
+export interface UserItem {
   displayName: string; // Assuming name is a property of the UserItem
   description: string; // Assuming description is a property of the UserItem
   uid: string;
