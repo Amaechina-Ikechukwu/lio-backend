@@ -1,7 +1,7 @@
 import { getFirestore } from "firebase-admin/firestore";
 import logger from "../../middlewares/logger";
 
-async function GetProjectClicks(projectId: string): Promise<number> {
+export async function GetProjectClicks(projectId: string): Promise<number> {
   try {
     let clicks = 0;
     const db = getFirestore();

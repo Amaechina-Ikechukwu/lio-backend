@@ -1,70 +1,88 @@
 import { getFirestore } from "firebase-admin/firestore";
 import { PublicUserProfile } from "../../interfaces";
 import logger from "../../middlewares/logger";
-
 import { truncateDescription } from "../profile/GetProjectsByUsername";
+import NumberOfClicks from "../profile/GetNumberOfClicks";
+import { GetProjectClicks } from "./GetProjectsByClicks";
 
 interface PortfolioItem {
   id: string;
   name: string;
   description: string;
-  heroimage: string;
+  heroImage: string;
   technologyStack: string;
   tags: string;
   user: string;
+  nickName: string;
+  clicks?: number | string;
 }
 
 const searchProjects = async (search: string, category: string) => {
   const firestore = getFirestore();
   const portfolio: PortfolioItem[] = [];
   const snapshot = await firestore.collection("general-portfolios").get();
-
+  if (!category) {
+    category = "name";
+  }
   if (snapshot.empty) {
     logger.warn("No projects found.");
     return { projects: portfolio };
   }
 
-  snapshot.forEach((doc) => {
+  for (const doc of snapshot.docs) {
     if (doc.exists) {
-      const data = doc.data() as PortfolioItem;
-      const { name, description, heroimage, technologyStack, tags, user } =
-        data;
+      const data = doc.data();
+      const {
+        name,
+        description,
+        heroimage,
+        technologyStack,
+        tags,
+        user,
+        nickname,
+      } = data;
 
       const matchesSearch = (field: string) =>
         field.toLowerCase().includes(search.toLowerCase());
-
+      let clicks = 0;
       let addToPortfolio = false;
 
-      switch (category) {
+      switch (category.toLowerCase()) {
         case "name":
           addToPortfolio = matchesSearch(name);
+
           break;
         case "technology":
           addToPortfolio = matchesSearch(technologyStack);
+
           break;
         case "tags":
           addToPortfolio = matchesSearch(tags);
+
           break;
         default:
-          logger.warn("Unknown category:", category);
+          logger.warn(`Unknown category: ${category}`);
           break;
       }
 
       if (addToPortfolio) {
+        clicks = await GetProjectClicks(nickname);
         portfolio.push({
           id: doc.id,
           name,
           description,
-          heroimage,
+          heroImage: heroimage,
           technologyStack,
           tags,
           user,
+          nickName: nickname,
+          clicks,
         });
       }
     } else {
       console.error("Document does not exist:", doc.id);
     }
-  });
+  }
 
   return { projects: portfolio };
 };
@@ -75,7 +93,6 @@ async function GetUsers(
   try {
     const firestore = getFirestore();
     const userData: PublicUserProfile[] = [];
-
     const snapshot = await firestore.collection("profile").get();
 
     if (snapshot.empty) {
@@ -83,25 +100,29 @@ async function GetUsers(
       return { userData };
     }
 
-    snapshot.forEach((doc) => {
+    for (const doc of snapshot.docs) {
       if (doc.exists) {
-        if (doc.data().username.includes(search))
+        const data = doc.data();
+        if (data.username.toLowerCase().includes(search.toLowerCase())) {
+          const clicks = (await NumberOfClicks(doc.id)).number;
           userData.push({
-            displayName: doc.data().displayName,
-            username: doc.data().username,
-            bio: truncateDescription(doc.data().bio, 200),
-            photoURL: doc.data().photoURL,
-            coverimage: doc.data().coverimage,
-            technologyStack: doc.data().technologyStack || "",
+            displayName: data.displayName,
+            username: data.username,
+            bio: truncateDescription(data.bio, 200),
+            photoURL: data.photoURL,
+            coverimage: data.coverimage,
+            technologyStack: data.technologyStack || "",
+            clicks,
           });
+        }
       } else {
         console.error("Document does not exist:", doc.id);
       }
-    });
+    }
 
     return { userData };
   } catch (error) {
-    throw new Error(`Error fetching user projects from the database: ${error}`);
+    throw new Error(`Error fetching user profiles from the database: ${error}`);
   }
 }
 
@@ -112,11 +133,19 @@ export default async function QueryPortfolio(
   portfolio: { user: PublicUserProfile[]; projects: PortfolioItem[] };
 }> {
   try {
-    const { projects } = await searchProjects(search, category);
-    const { userData } = await GetUsers(search);
+    // Run both functions concurrently
+    const [projectsResult, userDataResult] = await Promise.all([
+      searchProjects(search, category),
+      GetUsers(search),
+    ]);
+
+    // Extract the results
+    const { projects } = projectsResult;
+    const { userData } = userDataResult;
+
     const portfolio = { user: userData, projects };
     return { portfolio };
   } catch (error) {
-    throw new Error(`Error fetching user projects from the database: ${error}`);
+    throw new Error(`Error fetching portfolio from the database: ${error}`);
   }
 }

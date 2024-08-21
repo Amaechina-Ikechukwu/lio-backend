@@ -4,6 +4,7 @@ export interface PortfolioItem {
   description: string; // Assuming description is a property of the PortfolioItem
   heroimage: string; // Assuming image is a property of the PortfolioItem
   nickname: string;
+  clicks?: number | string;
 }
 export interface ExplorePortfolioItem {
   id: string;
@@ -20,6 +21,7 @@ export interface PublicUserProfile {
   photoURL: string;
   coverimage: string;
   technologyStack: string;
+  clicks?: number | string;
 }
 
 export interface PublicPortfolio {
