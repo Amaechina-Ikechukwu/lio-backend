@@ -112,7 +112,7 @@ async function GetUsers(
             photoURL: data.photoURL,
             coverimage: data.coverimage,
             technologyStack: data.technologyStack || "",
-            clicks,
+            portfolioClicks: clicks,
           });
         }
       } else {

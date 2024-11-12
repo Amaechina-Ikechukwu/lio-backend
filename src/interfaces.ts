@@ -21,7 +21,7 @@ export interface PublicUserProfile {
   photoURL: string;
   coverimage: string;
   technologyStack: string;
-  clicks?: number | string;
+  portfolioClicks?: number | string;
 }
 
 export interface PublicPortfolio {
