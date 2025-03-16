@@ -18,56 +18,58 @@ interface PortfolioItem {
 }
 
 const searchProjects = async (search: string, category: string) => {
-  const firestore = getFirestore();
-  const portfolio: PortfolioItem[] = [];
-  const snapshot = await firestore.collection("general-portfolios").get();
-  if (!category) {
-    category = "name";
-  }
-  if (snapshot.empty) {
-    logger.warn("No projects found.");
-    return { projects: portfolio };
-  }
+  try {
+    const firestore = getFirestore();
+    const snapshot = await firestore.collection("general-portfolios").get();
 
-  for (const doc of snapshot.docs) {
-    if (doc.exists) {
-      const data = doc.data();
-      const {
-        name,
-        description,
-        heroimage,
-        technologyStack,
-        tags,
-        user,
-        nickname,
-      } = data;
+    if (snapshot.empty) {
+      logger.warn("No projects found.");
+      return { projects: [] };
+    }
 
-      const matchesSearch = (field: string) =>
-        field.toLowerCase().includes(search.toLowerCase());
-      let clicks = 0;
-      let addToPortfolio = false;
+    // Ensure category is valid
+    category = category || "name";
 
-      switch (category.toLowerCase()) {
-        case "name":
-          addToPortfolio = matchesSearch(name);
+    // Function to check if a field matches the search query
+    const matchesSearch = (field?: string) =>
+      field?.toLowerCase().includes(search.toLowerCase()) ?? false;
 
-          break;
-        case "technology":
-          addToPortfolio = matchesSearch(technologyStack);
+    const projects = await Promise.all(
+      snapshot.docs.map(async (doc) => {
+        if (!doc.exists) return null;
 
-          break;
-        case "tags":
-          addToPortfolio = matchesSearch(tags);
+        const data = doc.data();
+        const {
+          name,
+          description,
+          heroimage,
+          technologyStack = "", // Default to empty string
+          tags = "", // Default to empty string
+          user,
+          nickname,
+        } = data;
 
-          break;
-        default:
-          logger.warn(`Unknown category: ${category}`);
-          break;
-      }
+        let addToPortfolio = false;
 
-      if (addToPortfolio) {
-        clicks = await GetProjectClicks(nickname);
-        portfolio.push({
+        switch (category.toLowerCase()) {
+          case "name":
+            addToPortfolio = matchesSearch(name);
+            break;
+          case "technology":
+            addToPortfolio = matchesSearch(technologyStack);
+            break;
+          case "tags":
+            addToPortfolio = matchesSearch(tags);
+            break;
+          default:
+            logger.warn(`Unknown category: ${category}`);
+            return null; // Skip invalid category
+        }
+
+        if (!addToPortfolio) return null;
+
+        const clicks = await GetProjectClicks(nickname);
+        return {
           id: doc.id,
           name,
           description,
@@ -77,14 +79,16 @@ const searchProjects = async (search: string, category: string) => {
           user,
           nickName: nickname,
           clicks,
-        });
-      }
-    } else {
-      console.error("Document does not exist:", doc.id);
-    }
-  }
+        };
+      })
+    );
 
-  return { projects: portfolio };
+    // Remove null values (failed searches or invalid docs)
+    return { projects: projects.filter(Boolean) };
+  } catch (error: any) {
+    logger.error(`Error fetching projects: ${error.message}`);
+    throw new Error(`Error fetching projects: ${error.message}`);
+  }
 };
 
 async function GetUsers(
@@ -93,33 +97,36 @@ async function GetUsers(
   try {
     const firestore = getFirestore();
     const userData: PublicUserProfile[] = [];
-    const snapshot = await firestore.collection("profile").get();
+
+    // Use Firestore query to filter by username (case-sensitive limitation)
+    const snapshot = await firestore
+      .collection("profile")
+      .where("username", ">=", search)
+      .where("username", "<=", search + "\uf8ff")
+      .get();
 
     if (snapshot.empty) {
       logger.warn("No matching user profiles found.");
       return { userData };
     }
 
-    for (const doc of snapshot.docs) {
-      if (doc.exists) {
-        const data = doc.data();
-        if (data.username.toLowerCase().includes(search.toLowerCase())) {
-          const clicks = (await NumberOfClicks(doc.id)).number;
-          userData.push({
-            displayName: data.displayName,
-            username: data.username,
-            bio: truncateDescription(data.bio, 200),
-            photoURL: data.photoURL,
-            coverimage: data.coverimage,
-            technologyStack: data.technologyStack || "",
-            portfolioClicks: clicks,
-          });
-        }
-      } else {
-        console.error("Document does not exist:", doc.id);
-      }
-    }
+    // Batch click counts for better performance
+    const clickPromises = snapshot.docs.map((doc) => NumberOfClicks(doc.id));
+    const clickCounts = await Promise.all(clickPromises);
 
+    snapshot.docs.forEach((doc, index) => {
+      const data = doc.data();
+      userData.push({
+        displayName: data.displayName,
+        username: data.username,
+        bio: truncateDescription(data.bio, 200),
+        photoURL: data.photoURL,
+        coverimage: data.coverimage,
+        technologyStack: data.technologyStack || "",
+        portfolioClicks: clickCounts[index].number,
+      });
+    });
+    console.log({ userData });
     return { userData };
   } catch (error) {
     throw new Error(`Error fetching user profiles from the database: ${error}`);
@@ -133,19 +140,27 @@ export default async function QueryPortfolio(
   portfolio: { user: PublicUserProfile[]; projects: PortfolioItem[] };
 }> {
   try {
-    // Run both functions concurrently
-    const [projectsResult, userDataResult] = await Promise.all([
+    // Run both functions concurrently with better error handling
+    const [projectsResult, userDataResult] = await Promise.allSettled([
       searchProjects(search, category),
       GetUsers(search),
     ]);
 
-    // Extract the results
-    const { projects } = projectsResult;
-    const { userData } = userDataResult;
+    // Extract results safely with default values if one fails
+    const projects =
+      projectsResult.status === "fulfilled"
+        ? projectsResult.value.projects
+        : [];
+    const userData =
+      userDataResult.status === "fulfilled"
+        ? userDataResult.value.userData
+        : [];
 
-    const portfolio = { user: userData, projects };
-    return { portfolio };
-  } catch (error) {
-    throw new Error(`Error fetching portfolio from the database: ${error}`);
+    return { portfolio: { user: userData, projects } };
+  } catch (error: any) {
+    throw new Error(
+      `Error fetching portfolio from the database: ${error.message}`
+    );
   }
 }
+

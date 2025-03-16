@@ -10,32 +10,46 @@ export interface UserItem {
 
 export default async function GetSingleUser(
   search: string
-): Promise<{ userData: UserItem[] }> {
+): Promise<{ userData: UserItem | null }> {
   try {
-    let userData;
     const firestore = getFirestore(); // Get Firestore instance
 
     const snapshot = await firestore
       .collection("profile")
-      .where("username", "==", search)
+      .where("username", ">=", search.toLowerCase())
+      .where("username", "<=", search.toLowerCase() + "\uf8ff")
+
+      .limit(1) // We only need one user
       .get();
+
     if (snapshot.empty) {
-      logger.error("No matching documents.");
-      return { userData };
+      logger.error(`No user found with username: ${search}`);
+      return { userData: null };
     }
-    snapshot.forEach((doc) => {
-      if (doc.exists) {
-        // Extract desired properties
 
-        userData = doc.data();
-      } else {
-        console.error("Document does not exist:", doc.id);
-        // You might want to handle the case when doc doesn't exist
-      }
-    });
+    // Extract the first matching document
+    const doc = snapshot.docs[0];
+    const data = doc.data();
 
-    return { userData };
-  } catch (error) {
-    throw new Error(`Error fetching user projects from the database: ${error}`);
+    // if (!data.displayName || !data.uid || !data.photoUrl) {
+    //   logger.warn(`Skipping incomplete user profile: ${doc.id}`);
+    //   return { userData: null };
+    // }
+
+    // Filter out unnecessary fields
+    const {
+      updatedAt,
+      lastRefreshTime,
+      lastSignInTime,
+      creationTime,
+      providerId,
+      ...filteredData
+    } = data;
+
+    return { userData: filteredData as UserItem };
+  } catch (error: any) {
+    logger.error(`Error fetching user: ${error.message}`);
+    throw new Error(`Error fetching user: ${error.message}`);
   }
 }
+

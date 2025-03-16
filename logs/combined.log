@@ -122,3 +122,26 @@
 2024-08-21T12:41:06.346Z [warn]: Unknown category: 
 2024-08-21T12:41:06.346Z [warn]: Unknown category: 
 2024-08-21T12:41:06.347Z [warn]: Unknown category: 
+2025-03-16T08:25:45.889Z [error]: No matching documents.
+2025-03-16T08:25:55.573Z [error]: No matching documents.
+2025-03-16T08:26:11.523Z [error]: No matching documents.
+2025-03-16T08:31:25.541Z [error]: No matching documents.
+2025-03-16T08:32:02.937Z [error]: No matching documents.
+2025-03-16T08:33:36.565Z [error]: No matching documents.
+2025-03-16T08:41:40.211Z [error]: No user found with username: ikay
+2025-03-16T08:41:57.621Z [error]: No user found with username: ok
+2025-03-16T08:42:05.117Z [error]: No user found with username: ik
+2025-03-16T08:43:12.985Z [error]: No user found with username: ik
+2025-03-16T08:43:22.932Z [error]: No user found with username: am
+2025-03-16T08:47:13.587Z [warn]: Skipping incomplete user profile: XRcZM4rs7DaSCStCCIvgkuVrlxh2
+2025-03-16T08:47:23.017Z [warn]: Skipping incomplete user profile: XRcZM4rs7DaSCStCCIvgkuVrlxh2
+2025-03-16T08:48:33.119Z [warn]: No project found with nickname: lio
+2025-03-16T08:49:29.350Z [warn]: Project data is incomplete: 4tqrCYYdqPRVrAKHsioh
+2025-03-16T09:16:25.149Z [error]: Error: Expected double-quoted property name in JSON at position 33 (line 3 column 1)
+2025-03-16T09:20:55.322Z [error]: Error: Expected double-quoted property name in JSON at position 33 (line 3 column 1)
+2025-03-16T09:34:45.998Z [error]: /updateproject: Error updating project: 5 NOT_FOUND: No document to update: projects/lio-6af30/databases/(default)/documents/portfolios/XRcZM4rs7DaSCStCCIvgkuVrlxh2/lio/rNgiKSKaGuOUsOckk1TG
+2025-03-16T09:37:46.654Z [error]: /updateproject: Error updating project Error: 5 NOT_FOUND: No document to update: projects/lio-6af30/databases/(default)/documents/portfolios/XRcZM4rs7DaSCStCCIvgkuVrlxh2/lio/rNgiKSKaGuOUsOckk1TG
+2025-03-16T09:44:51.189Z [error]: /updateproject: Error updating project: Error updating general-portfolios: 5 NOT_FOUND: No document to update: projects/lio-6af30/databases/(default)/documents/general-portfolios/7vTHaumIa3G68rjuld7i
+2025-03-16T10:01:39.397Z [error]: No matching documents.
+2025-03-16T10:03:56.142Z [error]: No matching documents.
+2025-03-16T10:06:41.393Z [error]: No matching documents.

@@ -1,31 +1,49 @@
 import express from "express";
-// import { initializeApp } from "firebase-admin/app";
 import "dotenv/config";
+import cors from "cors"; // Import CORS
 import router from "./controllers";
 import { getFirestore } from "firebase-admin/firestore";
 import explorerouter from "./controllers/explore";
-
 import expressWinston from "express-winston";
 import logger from "./middlewares/logger";
 import errorHandler from "./middlewares/errorHandler";
+
 const app = express();
+
+// Allow specific origins, including localhost and others
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://lio-beta.vercel.app/",
+  "https://lio-amaechinaikechukwus-projects.vercel.app/",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // Allows sending cookies and authorization headers
+  })
+);
+
 app.use(express.json());
-// const credential = require("../x.json");
+
 var admin = require("firebase-admin");
 var serviceAccount = require("../xx.json");
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// const myRefreshToken = "../x.json"; // Get refresh token from OAuth2 flow
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://dot-king-default-rtdb.firebaseio.com/",
   ignoreUndefinedProperties: true,
 });
+
 const firestore = getFirestore();
 firestore.settings({ ignoreUndefinedProperties: true });
+
 app.use("/", router);
 app.use("/explore", explorerouter);
 app.use(errorHandler);
@@ -36,7 +54,8 @@ app.use(
     winstonInstance: logger,
   })
 );
+
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  console.log("Accepted to lio new");
+  console.log(`Server running on port ${port}`);
 });

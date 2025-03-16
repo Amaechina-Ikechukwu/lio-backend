@@ -22,6 +22,7 @@ import DeleteProject from "../actions/profile/DeleteProject";
 import AddToClicks from "../actions/profile/AddToClicks";
 import NumberOfClicks from "../actions/profile/GetNumberOfClicks";
 import ProjectClicks from "../actions/profile/ProjectClicks";
+import logger from "../middlewares/logger";
 
 const router = Router();
 declare global {
@@ -55,9 +56,9 @@ router.get(
 
       // const uuid = extractUUIDFromToken(verifiedToken?.uuid);
       const uid = verifiedToken.data;
-      res.status(200).json({ userid: uid });
+      res.status(200).json({ success: true, userid: uid });
     } catch (error) {
-      console.error("Error validating user", error);
+      logger.error(`/userid: ${error}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
@@ -68,9 +69,10 @@ router.get(
   async (req: Request, res: Response) => {
     try {
       const result = await GetUserProfile(req.uid);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });
+      logger.error(`/userprofile: ${error}`);
     }
   }
 );
@@ -80,7 +82,7 @@ router.get("/userprojects", async (req: Request, res: Response) => {
   if (typeof uid === "string") {
     try {
       const result = await GetUserProjects(uid);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });
     }
@@ -94,9 +96,10 @@ router.get("/userprojectsbyusername", async (req: Request, res: Response) => {
   if (typeof username === "string") {
     try {
       const result = await GetProjectsByUsername(username);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });
+      logger.error(`/userprojectsbyusername: ${error}`);
     }
   } else {
     res.status(400).json({ error: "Invalid user parameter" });
@@ -108,9 +111,10 @@ router.get("/searchprojects", async (req: Request, res: Response) => {
   if (typeof search === "string") {
     try {
       const result = await GetPortfolioFromGeneral(search);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });
+      logger.error(`/searchprojects: ${error}`);
     }
   } else {
     res.status(400).json({ error: "Invalid user parameter" });
@@ -122,9 +126,10 @@ router.get("/searchusers", async (req: Request, res: Response) => {
   if (typeof search === "string") {
     try {
       const result = await GetGeneralUsers(search);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" + error });
+      logger.error(`/searchusers: ${error}`);
     }
   } else {
     res.status(400).json({ error: "Invalid user parameter" });
@@ -136,8 +141,9 @@ router.get("/searchuser", async (req: Request, res: Response) => {
   if (typeof search === "string") {
     try {
       const result = await GetSingleUser(search);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
+      logger.error(`/searchuser: ${error}`);
       res.status(500).json({ error: "Internal server error" + error });
     }
   } else {
@@ -152,6 +158,7 @@ router.get("/searchproject", async (req: Request, res: Response) => {
       const result = await GetSingleProject(search);
       res.status(200).json(result);
     } catch (error) {
+      logger.error(`/searchproject: ${error}`);
       res.status(500).json({ error: "Internal server error" + error });
     }
   } else {
@@ -164,12 +171,13 @@ router.get("/userproject", async (req: Request, res: Response) => {
   if (typeof user === "string" && typeof projectId === "string") {
     try {
       const result = await GetProject(user, projectId);
-      res.status(200).json(result);
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
+      logger.error(`/userproject: ${error}`);
       res.status(500).json({ error: "Internal server error" + error });
     }
   } else {
-    res.status(400).json({ error: "Invalid user parameter" });
+    res.status(400).json({ error: "Invalid user and project parameter" });
   }
 });
 router.get(
@@ -180,6 +188,7 @@ router.get(
       const result = await GetUserProjects(req.uid);
       res.status(200).json(result);
     } catch (error) {
+      logger.error(`/getuserprojects: ${error}`);
       res.status(500).json({ error: "Internal server error" + error });
     }
   }
@@ -193,20 +202,20 @@ router.post(
       const result = await RegisterUser(uid);
       const data = await UserAuthenticationData(uid);
       await AddUserToDatabase(uid, data);
-      res.status(200).json({ token: result });
+      res.status(200).json({ success: true, token: result });
     } catch (error) {
-      console.error("Error validating user", error);
+      logger.error(`/registeruser: ${error}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
 );
-router.post("/addtoclicks", async (req: Request, res: Response) => {
+router.post("/addtoclicks/:uid", async (req: Request, res: Response) => {
   try {
-    const { uid } = req.body;
+    const { uid } = req.params;
     await AddToClicks(uid);
-    res.status(200).json();
+    res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Error validating user", error);
+    logger.error(`/addtoclicks: ${error}`);
     res.status(500).json({ error: "Internal server error" }); // Handle error properly
   }
 });
@@ -214,20 +223,20 @@ router.post("/projectclicks", async (req: Request, res: Response) => {
   try {
     const { uid, projectId } = req.body;
     await ProjectClicks(uid, projectId);
-    res.status(200).json();
+    res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Error validating user", error);
+    logger.error(`/projectclicks: ${error}`);
     res.status(500).json({ error: "Internal server error" }); // Handle error properly
   }
 });
-router.get("/numberofclicks", async (req: Request, res: Response) => {
-  const { uid } = req.query;
+router.get("/numberofclicks/:uid", async (req: Request, res: Response) => {
+  const { uid } = req.params;
   if (typeof uid == "string") {
     try {
       const { number } = await NumberOfClicks(uid);
-      res.status(200).json({ number });
+      res.status(200).json({ success: true, number });
     } catch (error) {
-      console.error("Error validating user", error);
+      logger.error(`/numberofclicks: ${error}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
@@ -240,43 +249,43 @@ router.post(
       // Destructure 'uid' directly from req.body
 
       const result = await UpdateUserProfile(req.uid, req.body); // Pass 'uid' directly to RegisterUser function
-      res.status(200).json({ token: result });
+      res.status(200).json({ success: true, ...result });
     } catch (error) {
-      console.error("Add user to database user", error);
+      logger.error(`/updateuserprofile: ${error}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
 );
-router.post(
-  "/updateproject",
+router.put(
+  "/updateproject/:projectId",
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
   async (req: Request, res: Response) => {
     try {
       // Destructure 'uid' directly from req.body
-      const { projectId } = req.query;
+      const { projectId } = req.params;
       if (typeof projectId === "string") {
         const result = await UpdateProjects(req.body, req.uid, projectId); // Pass 'uid' directly to RegisterUser function
-        res.status(200).json({ token: result });
+        res.status(200).json({ success: true, ...result });
       }
-    } catch (error) {
-      console.error("Add user to database user", error);
+    } catch (error: any) {
+      logger.error(`/updateproject: ${error.message}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
 );
 router.delete(
-  "/deleteproject",
+  "/deleteproject/:projectId",
   ValidatedUUIDHeader, // Assuming RequestValidator middleware is correctly implemented
   async (req: Request, res: Response) => {
     try {
       // Destructure 'uid' directly from req.body
-      const { projectId } = req.query;
+      const { projectId } = req.params;
       if (typeof projectId === "string") {
         const result = await DeleteProject(req.body, req.uid, projectId); // Pass 'uid' directly to RegisterUser function
-        res.status(200).json({ token: result });
+        res.status(200).json(result);
       }
-    } catch (error) {
-      console.error("Add user to database user", error);
+    } catch (error: any) {
+      logger.error(`/deleteproject: ${error.message}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
@@ -303,9 +312,9 @@ router.post(
         user: userprofile.displayName.trim().toLowerCase().split(" ").join("-"),
       });
       const result = await CreatePortfolio(data, req.uid); // Pass 'uid' directly to RegisterUser function
-      res.status(200).json({ token: result });
-    } catch (error) {
-      console.error("Add user to database user", error);
+      res.status(201).json(result);
+    } catch (error: any) {
+      logger.error(`/createportfolio: ${error.message}`);
       res.status(500).json({ error: "Internal server error" }); // Handle error properly
     }
   }
@@ -373,6 +382,7 @@ router.get("/auth/google/callback", async (req, res) => {
   } catch (error: any) {
     // Handle errors
     console.error("Error during authentication:", error.message);
+    logger.error(`Error during authentication: ${error.message}`);
     res.status(500).send("Authentication error");
   }
 });

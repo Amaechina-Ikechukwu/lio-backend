@@ -1,32 +1,39 @@
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
-const AddToGeneral = async (data: any, uid: string, projectId: string) => {
+
+const AddToGeneral = async (data: any, projectId: string) => {
   try {
     await getFirestore()
       .collection("general-portfolios")
       .doc(projectId)
       .update(data);
-    return;
-  } catch {}
+  } catch (error: any) {
+    console.error(`Error updating general-portfolios: ${error.message}`);
+    throw new Error(`Error updating general-portfolios: ${error.message}`);
+  }
 };
+
 export default async function UpdateProjects(
   data: any,
   uid: string,
   projectId: string
 ) {
-  const userdata = Object.assign(data, { updatedAt: Timestamp.now() });
+  // Create a new object to avoid modifying the original `data`
+  const updatedData = { ...data, updatedAt: Timestamp.now() };
 
   try {
-    const firestore = getFirestore(); // Set Firestore settings
+    const firestore = getFirestore();
 
     await firestore
       .collection("portfolios")
       .doc(uid)
       .collection("lio")
       .doc(projectId)
-      .update(userdata);
-    await AddToGeneral(userdata, uid, projectId);
-    return { message: "updated" }; // Returning the result directly
-  } catch (error) {
-    throw new Error(`Error adding user to database ${error}`);
+      .update(updatedData);
+
+    await AddToGeneral(updatedData, projectId);
+
+    return { message: "updated" };
+  } catch (error: any) {
+    throw new Error(`Error updating project: ${error.message}`);
   }
 }

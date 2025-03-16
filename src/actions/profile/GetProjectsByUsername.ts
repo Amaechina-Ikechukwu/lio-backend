@@ -3,49 +3,62 @@ import logger from "../../middlewares/logger";
 
 interface PortfolioItem {
   id: string;
-  name: string; // Assuming name is a property of the PortfolioItem
-  description: string; // Assuming description is a property of the PortfolioItem
-  heroimage: string; // Assuming image is a property of the PortfolioItem
+  name: string;
+  description: string;
+  heroimage: string;
   nickname: string;
 }
+
+// Function to truncate long descriptions
 export function truncateDescription(description: string, maxLength: number) {
-  if (description.length > maxLength) {
-    return description.slice(0, maxLength - 3) + "...";
-  }
-  return description;
+  if (!description) return ""; // Prevent errors if description is missing
+  return description.length > maxLength
+    ? description.slice(0, maxLength - 3) + "..."
+    : description;
 }
+
 export default async function GetProjectsByUsername(
   username: string
 ): Promise<{ userportfolio: PortfolioItem[] }> {
   try {
-    const userportfolio: PortfolioItem[] = [];
-    const firestore = getFirestore(); // Get Firestore instance
+    const firestore = getFirestore();
+    const usernameLower = username.toLowerCase(); // Normalize search input
 
     const snapshot = await firestore
       .collection("general-portfolios")
-      .where("user", "==", username)
+      .where("userLower", ">=", usernameLower) // Case-insensitive range search
+      .where("userLower", "<=", usernameLower + "\uf8ff") // Firestore range trick
       .get();
 
-    snapshot.forEach((doc) => {
-      if (doc.exists) {
-        const { name, description, heroimage, nickname } = doc.data(); // Extract desired properties
-        const truncatedDescription = truncateDescription(description, 200);
+    if (snapshot.empty) {
+      logger.warn(`No projects found for user: ${username}`);
+      return { userportfolio: [] };
+    }
 
-        userportfolio.push({
+    const userportfolio: PortfolioItem[] = snapshot.docs
+      .map((doc) => {
+        const data = doc.data();
+
+        if (!data.name || !data.heroimage || !data.nickname) {
+          logger.warn(`Skipping incomplete project document: ${doc.id}`);
+          return null; // Skip incomplete documents
+        }
+
+        return {
           id: doc.id,
-          name,
-          description: truncatedDescription,
-          heroimage,
-          nickname,
-        });
-      } else {
-        // You might want to handle the case when doc doesn't exist
-        logger.error(`Document ${doc.id} does not exist.`);
-      }
-    });
+          name: data.name,
+          description: truncateDescription(data.description || "", 200),
+          heroimage: data.heroimage,
+          nickname: data.nickname,
+        };
+      })
+      .filter(Boolean) as PortfolioItem[]; // Remove null values
 
     return { userportfolio };
-  } catch (error) {
-    throw new Error(`Error fetching user projects from the database: ${error}`);
+  } catch (error: any) {
+    logger.error(
+      `Error fetching projects for user ${username}: ${error.message}`
+    );
+    throw new Error(`Error fetching projects: ${error.message}`);
   }
 }
